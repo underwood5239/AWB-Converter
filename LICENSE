@@ -1,0 +1,51 @@
+MIT License
+
+Copyright (c) 2026 AWB-Converter contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-------------------------------------------------------------------------------
+NOTE ON BUNDLED THIRD-PARTY COMPONENTS
+
+This repository redistributes binaries from the vgmstream project
+(https://github.com/vgmstream/vgmstream) inside the tools/ directory and,
+at build time, embedded into the produced executable:
+
+    tools/vgmstream-cli.exe
+    tools/*.dll
+
+Those files are licensed as follows, and are Copyright (c) the vgmstream
+project and its contributors:
+
+  * vgmstream's own code (vgmstream-cli.exe, libatrac9/libcelt/libg719_decode/
+    libmpg123/libspeex/libvorbis/xmp-vgmstream DLLs) is distributed under a
+    permissive ISC-style license. The full text is provided in
+    tools/vgmstream-COPYING.txt.
+
+  * The four FFmpeg-derived libraries (avcodec-vgmstream-59.dll,
+    avformat-vgmstream-59.dll, avutil-vgmstream-57.dll,
+    swresample-vgmstream-4.dll) are licensed under the GNU Lesser General
+    Public License v2.1 (LGPL-2.1).
+
+The full license text in tools/vgmstream-COPYING.txt, together with
+tools/vgmstream-LICENSE.txt, must be preserved when redistributing these
+files, including when they are embedded into an executable.
+
+The MIT license above applies only to the original source code in this
+repository (src/ and documentation), not to those third-party binaries.

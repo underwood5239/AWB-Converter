@@ -1,0 +1,13 @@
+# 构建产物（由 build.ps1 生成，不需要提交）
+src/awbtools.bin
+src/csc.rsp
+src/csc.out
+src/csc.err
+dist/
+
+# 系统与编辑器
+Thumbs.db
+desktop.ini
+.vs/
+*.user
+*.suo

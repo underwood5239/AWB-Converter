@@ -1,0 +1,60 @@
+本目录 / This directory
+============================================================
+
+这里存放的是 vgmstream 项目的官方预编译二进制文件，不是本项目的原创代码。
+
+The files in this directory are prebuilt binaries from the vgmstream project.
+They are NOT original code of this repository.
+
+来源 / Source
+------------------------------------------------------------
+https://github.com/vgmstream/vgmstream/releases
+版本 / Version: r2117-148-g7bfe9c26  (vgmstream-win64)
+
+许可 / License
+------------------------------------------------------------
+vgmstream 自身代码：ISC 风格宽松许可（允许任意使用、修改、分发，
+只需保留版权与许可声明）。完整文本见本目录 vgmstream-COPYING.txt。
+
+vgmstream's own code is distributed under a permissive ISC-style license.
+Full text: vgmstream-COPYING.txt in this directory.
+
+其中来自 FFmpeg 的 4 个库采用 GNU Lesser General Public License v2.1：
+    avcodec-vgmstream-59.dll
+    avformat-vgmstream-59.dll
+    avutil-vgmstream-57.dll
+    swresample-vgmstream-4.dll
+LGPL-2.1 全文：https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+
+The four FFmpeg-derived DLLs listed above are licensed under LGPL-2.1.
+
+版权 / Copyright
+------------------------------------------------------------
+Copyright (c) 2008-2025 Adam Gashlin, Fastelbja, Ronny Elfert, bnnm,
+Christopher Snowhill, NicknineTheEagle, bxaimc, Thealexbarney,
+CyberBotX, EdnessP, et al
+Portions Copyright (c) 2004-2008 Marko Kreen, and others; see COPYING.
+
+再分发要求 / Redistribution
+------------------------------------------------------------
+重新分发这些文件（包括把它们内嵌进 exe）时，必须同时保留许可文本
+vgmstream-COPYING.txt，并明确标注来源与版本。
+
+The full license text in vgmstream-COPYING.txt must be preserved when these
+files are redistributed, including when embedded into an executable.
+
+文件清单 / File list
+------------------------------------------------------------
+vgmstream-cli.exe            命令行解码器主程序
+avcodec-vgmstream-59.dll     FFmpeg 编解码库（vgmstream 定制版）
+avformat-vgmstream-59.dll    FFmpeg 封装格式库
+avutil-vgmstream-57.dll      FFmpeg 工具库
+swresample-vgmstream-4.dll   FFmpeg 重采样库
+libatrac9.dll                ATRAC9 解码
+libcelt-0061.dll             CELT 0.6.1 解码
+libcelt-0110.dll             CELT 0.11.0 解码
+libg719_decode.dll           G.719 解码
+libmpg123-0.dll              MP3 解码
+libspeex-1.dll               Speex 解码
+libvorbis.dll                Vorbis 解码
+xmp-vgmstream.dll            libxmp 的 vgmstream 适配层
