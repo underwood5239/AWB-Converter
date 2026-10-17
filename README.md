@@ -139,5 +139,3 @@ AWB-Converter/
 本工具只做格式转换，不包含任何游戏资源，也不提供下载渠道。请自行确认使用场景合法。
 
 ---
-
-**English**: [docs/README.en.md](docs/README.en.md)
