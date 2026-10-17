@@ -1,72 +1,142 @@
 # AWB Audio Converter
 
-> A small dark-themed Windows tool that extracts `.awb` (and 100+ other game audio container formats) into `.wav`.
+> A small Windows tool that batch-exports game audio archives (`.awb` and more) to `.wav` — dark UI, single file, ready to run.
 
-Built for exporting BGM from the game *Girls' Frontline 2: Exilium*, whose `.awb` files often pack **two or more tracks into a single archive**. Dragging such a file onto `vgmstream-cli.exe` only exports the first track and silently drops the rest — this tool fixes that.
+Originally written for exporting audio from *Girls' Frontline 2: Exilium*. Its `.awb` files often **pack two or more tracks into a single archive**, and dragging such a file onto `vgmstream-cli.exe` exports only the first track and silently drops the rest — this tool exists to solve exactly that.
+
+<p align="center">
+  <img src="screenshot.png" alt="Screenshot" width="760">
+</p>
 
 ---
 
 ## Features
 
-- **All tracks exported** — every subsong in an `.awb` becomes `name_01.wav`, `name_02.wav`, …
-- **Two output formats** — `WAV 16-bit PCM` (smaller) or `WAV 32-bit float` (lossless from source)
-- **Two loop modes** — `2 loops + 10s fade` (default) / `original length` (no loop, no fade). Only affects files that actually declare loop points.
-- **Chinese UI** with per-track info: sample rate, channels, encoding, bitrate, loop points, and an estimated output duration for the selected loop mode
-- **Live export log** — command, per-track parameters, produced files, elapsed time, result
-- **Single portable exe** — vgmstream is embedded inside the binary; no installation required
-- **High DPI aware** — crisp text at 125% / 150% scaling
-- **Remembers settings** — output format and destination folder are restored on next launch
-- **Drag & drop** supported
+- **Every track exported**: as many tracks as an `.awb` contains, named `name_01.wav`, `name_02.wav`, …
+- **Two output formats**: `WAV 16bit (PCM, smaller)` / `WAV 32bit (float, lossless from source)`
+- **Chinese UI**: per-track sample rate, channels, encoding, bitrate, loop points, original duration, export duration and track name
+- **Logging**: decode command, per-track parameters, produced files, elapsed time and result, all in Chinese
+- **Single-file program**: vgmstream is packed inside the exe; copy one file and run, no installation
+- **Drag & drop**: you can drop a file straight into the window
 
-## Quick Start
+## Quick start (end users)
 
-1. Download `AWB转换器.exe` **and** `AWB转换器.exe.config` from [Releases](../../releases)
-   > ⚠️ Both files must sit in the same folder. The `.config` enables high-DPI support.
-2. Run `AWB转换器.exe`
-3. Pick a file, choose the output format and destination folder, click **开始导出** (Start export)
+1. Download `AWB转换器.exe` and `AWB转换器.exe.config` from [Releases](../../releases)
+   > ⚠️ **Both files must be placed in the same folder.** The `.config` enables high-DPI support; without it the text becomes blurry.
+2. Double-click `AWB转换器.exe`
+3. Click **浏览…** (Browse) to pick an audio file (or drop it into the window)
+4. Choose the output format → choose the destination folder → click **开始导出** (Start export)
 
-On first launch a folder named `AWB转换器_工具_<hash>` is extracted next to the exe (13 files, ~10.7 MB). That is the bundled vgmstream runtime — keep it. Subsequent launches reuse it.
+On first launch a folder named `AWB转换器_工具_<fingerprint>` (about 10.7 MB, 13 files) is extracted next to the exe. It is the vgmstream runtime — **do not delete it**. Later launches reuse it.
 
-## Build from source
+Output goes into `<your folder>\<file name>\`, one folder per archive:
 
-Requirements: Windows + **.NET Framework 4.x** (ships with Windows 10/11). No Visual Studio or .NET SDK needed.
+```
+AWB导出\
+└── BGM_Igla_Battle\
+    ├── BGM_Igla_Battle_01.wav   (track 1)
+    └── BGM_Igla_Battle_02.wav   (track 2)
+```
+
+## FAQ
+
+**Q: Why no MP3 / FLAC?**
+vgmstream can only output wav; converting to MP3/FLAC requires bundling an extra encoder (a static ffmpeg build is roughly 80 MB). To keep the download small, only wav is supported for now. You can always convert the exported wav files yourself.
+
+**Q: Why is the exported file much longer than the original audio?**
+Because the BGM declares loop points. By default it exports as "2 loops + 10 seconds fade" (vgmstream's default behaviour), which gives a complete listening experience. The info panel shows both the original duration and the export duration.
+
+**Q: Can it convert in batch?**
+Currently one file at a time; batch support is planned. A batch script built on `vgmstream-cli` already exists and will be merged in later.
+
+**Q: The exe triggers a virus warning?**
+Unsigned small tools are frequently flagged by antivirus software and browsers. The source is in `src/` — about 660 lines of C#. Read it and build it yourself.
+
+---
+
+## Building (developers)
+
+### Requirements
+
+- Windows 7 or later
+- **.NET Framework 4.x** (bundled with Windows 10/11, includes `csc.exe`)
+- No Visual Studio and no .NET SDK needed
+
+### Steps
 
 ```powershell
-git clone https://github.com/<your-name>/AWB-Converter.git
+git clone https://github.com/underwood5239/AWB-Converter.git
 cd AWB-Converter
 powershell -NoProfile -ExecutionPolicy Bypass -File src\build.ps1
 ```
 
-The script packs `tools\` into an embedded resource and compiles `dist\AWB转换器.exe` with `csc.exe`.
+The build script will:
 
-## Layout
+1. Validate the 13 vgmstream files under `tools\`
+2. Pack them into an embedded resource `src\awbtools.bin` (custom binary format, see below)
+3. Compile `dist\AWB转换器.exe` with `csc.exe` (icon and manifest included)
+4. Copy `app.config` → `dist\AWB转换器.exe.config`
+
+> To upgrade vgmstream, drop the new `vgmstream-cli.exe` and matching DLLs into `tools\` and rebuild. The embedded resource carries a SHA-256 fingerprint, so upgraded tools automatically get a new cache directory and never collide with the old one.
+
+### Project layout
 
 ```
-src/Program.cs      main program (C#, WinForms, ~660 lines)
-src/build.ps1       one-click build script
-src/app.manifest    DPI awareness + Win10 compatibility
-src/app.config      high-DPI settings (copied to exe.config)
-tools/              vgmstream-cli + dependencies (LGPL-2.1)
-dist/               build output (gitignored)
+AWB-Converter/
+├── src/
+│   ├── Program.cs        main program (C#, WinForms, ~660 lines)
+│   ├── build.ps1         one-click build script
+│   ├── app.manifest      DPI awareness + Win10 compatibility
+│   ├── app.config        high-DPI support (copied to exe.config)
+│   └── app.ico           program icon
+├── tools/                vgmstream-cli and dependencies (shipped with the repo for reproducible builds)
+│   ├── vgmstream-cli.exe
+│   ├── *.dll
+│   └── vgmstream-COPYING.txt
+├── docs/
+│   ├── README.en.md      this file
+│   └── vgmstream-README.md
+└── dist/                 build output (gitignored)
 ```
 
-## Hidden CLI mode
+### Embedded resource format
 
-```powershell
-AWB转换器.exe --export "D:\test.awb" --format pcm16  --out "D:\out"
-AWB转换器.exe --export "D:\test.awb" --format float32 --mode original --out "D:\out"
-```
+To make a single exe carry every runtime library, `build.ps1` concatenates the files into `awbtools.bin` using the format below, then embeds it via `/resource:`. At startup the program parses it, validates it and extracts it to a cache directory:
 
-`--mode` accepts `loop2` (default) or `original`. Returns 0 on success.
+| Offset | Type | Content |
+|---|---|---|
+| 0 | `uint32` | magic `0x31574241` (ASCII `ABW1`) |
+| 4 | `int32` | file count N |
+| 8 | … | repeated N times: `int32` name length, UTF-8 name, `int32` data length, data |
+
+Extraction targets are tried in order: folder next to the exe → `%LOCALAPPDATA%\AWBConverter\tools_<fingerprint>` → `%TEMP%`. The fingerprint is the first 16 hex characters of the resource pack's SHA-256, so upgraded tools never reuse an old cache.
+
+---
+
+## Roadmap
+
+- [ ] MP3 / FLAC output (requires an embedded encoder; download size grows noticeably)
+- [ ] Batch export (select several files / recurse a folder)
+- [ ] Selectable output sample rate and bit depth
+- [ ] Customizable loop count and fade length
+- [x] Dark UI
+- [x] High-DPI support
 
 ## Credits
 
-- **[vgmstream](https://github.com/vgmstream/vgmstream)** (r2117) does all the actual decoding. vgmstream's own code uses a permissive **ISC-style license** (see `tools/vgmstream-COPYING.txt`); the four FFmpeg-derived DLLs (`avcodec`/`avformat`/`avutil`/`swresample`) are **LGPL-2.1**. See `tools/vgmstream-LICENSE.txt`.
-- The application source (dark theme, DPI scaling, embedded-resource packaging, build script) was written by an AI assistant from [DeepSeek Harness](https://github.com/) in a pair-programming session.
+- **Decoding core**: [vgmstream](https://github.com/vgmstream/vgmstream) (r2117) does all format parsing and decoding; this repository merely wraps it in a Chinese UI plus a batch workflow.
+  - vgmstream's own code is under a **permissive ISC-style license** (use, modify and redistribute freely, keep the copyright notice). Copyright belongs to the vgmstream project and its contributors; full text in `tools/vgmstream-COPYING.txt`.
+  - The four DLLs `avcodec` / `avformat` / `avutil` / `swresample` come from **FFmpeg** and are licensed under **LGPL-2.1**; keep their license notice when redistributing.
+  - Packaging and redistribution notes: `tools/vgmstream-LICENSE.txt`.
+  - Thanks to the audio team of *Girls' Frontline 2: Exilium* (and to the odd packaging habit of stuffing two BGM tracks into one archive, which caused plenty of trouble — without it this tool would not exist).
 
 ## License
 
-- Source code in this repository: [MIT](../LICENSE)
-- Files under `tools/`: vgmstream's own code is ISC-style permissive; the four FFmpeg-derived DLLs are LGPL-2.1. See `tools/vgmstream-LICENSE.txt`.
+- **Source code in this repository** (`src/` and documentation): [MIT](../LICENSE)
+- **vgmstream-related files under `tools/`**: vgmstream's own code is under a **permissive ISC-style license** (copyright the vgmstream project and contributors; full text in `tools/vgmstream-COPYING.txt`); the four `av*` / `swresample` DLLs come from FFmpeg under **LGPL-2.1**. These license files must be preserved when redistributing. See `tools/vgmstream-LICENSE.txt` for details.
 
-This tool performs format conversion only. It bundles no game assets and provides no download sources.
+This tool only performs format conversion. It bundles no game assets and provides no download sources. Please make sure your use case is lawful.
+
+---
+
+**中文**: [../README.md](../README.md)
